@@ -1,0 +1,15 @@
+{
+  "name": "triostack-jwt-sdk-examples",
+  "version": "1.0.0",
+  "description": "Examples for TrioStack JWT SDK",
+  "type": "module",
+  "scripts": {
+    "start": "node basic-express-app.js",
+    "dev": "node --watch basic-express-app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cookie-parser": "^1.4.6",
+    "triostack-jwt-sdk": "file:.."
+  }
+}
