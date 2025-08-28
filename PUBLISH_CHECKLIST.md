@@ -70,9 +70,9 @@ The published package will include:
 ## 🔧 Post-Publishing
 
 After publishing:
-1. Update the repository URL in package.json if needed
+1. ✅ Repository URL in package.json updated to: https://github.com/Triostacksoftware/Triostack-JWT-SDK
 2. Create a GitHub release
-3. Update documentation links
+3. ✅ Documentation links updated
 4. Monitor for any issues
 
 ## 📝 Notes

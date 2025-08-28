@@ -59,7 +59,7 @@ export async function login(params = {}, res) {
   const ok = await bcrypt.compare(password, user.password);
   if (!ok) throw new Error('Invalid credentials');
 
-  const token = jwt.sign({ id: String(user._id) }, JWT_SECRET_KEY, { expiresIn: '1d' });
+  const token = jwt.sign({ id: String(user._id),email:user.email,name:user.name}, JWT_SECRET_KEY, { expiresIn: '1d' });
 
   res.cookie('token', token, cookieOptionsByEnv(NODE_ENV));
 

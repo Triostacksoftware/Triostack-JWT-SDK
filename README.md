@@ -241,4 +241,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Support
 
-If you encounter any issues or have questions, please [open an issue](https://github.com/yourusername/triostack-jwt-sdk/issues) on GitHub.
+If you encounter any issues or have questions, please [open an issue](https://github.com/Triostacksoftware/Triostack-JWT-SDK/issues) on GitHub.

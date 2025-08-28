@@ -1,6 +1,6 @@
 {
   "name": "triostack-jwt-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Plug-and-play JWT auth (register/login/logout) for Node.js backends using cookies + MongoDB.",
   "keywords": ["jwt", "auth", "cookies", "mongodb", "express", "triostack", "authentication", "middleware"],
   "main": "src/index.js",
@@ -28,13 +28,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/triostack-jwt-sdk.git"
+    "url": "https://github.com/Triostacksoftware/Triostack-JWT-SDK.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/triostack-jwt-sdk/issues"
+    "url": "https://github.com/Triostacksoftware/Triostack-JWT-SDK/issues"
   },
-  "homepage": "https://github.com/yourusername/triostack-jwt-sdk#readme",
-  "author": "Your Name <your.email@example.com>",
+  "homepage": "https://github.com/Triostacksoftware/Triostack-JWT-SDK#readme",
+  "author": "Triostack Software",
   "files": [
     "src/",
     "LICENSE",
