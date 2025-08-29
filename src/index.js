@@ -1,2 +1,2 @@
-export { register, login, logout, verifyToken, isLoggedIn } from './auth.js';
+export { register, login, logout, verifyToken, isLoggedIn, generateRegisterOtp, verifyOtpRegister, generateOtpLogin, verifyOtpLogin } from './auth.js';
 export { connectDB } from './db.js';

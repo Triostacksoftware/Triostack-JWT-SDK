@@ -8,7 +8,9 @@ export function getUserModel(tableName = 'users') {
   const schema = new mongoose.Schema(
     {
       email: { type: String, required: true, unique: true, index: true },
-      password: { type: String, required: true }
+      password: { type: String, required: true },
+      otp: { type: String },
+      expiry: { type: Date }
     },
     { timestamps: true, strict: false }
   );
