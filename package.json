@@ -1,6 +1,6 @@
 {
   "name": "triostack-jwt-sdk",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "description": "Plug-and-play JWT auth (register/login/logout/OTP) for Node.js backends using cookies + MongoDB.",
   "keywords": [
     "jwt",
@@ -25,8 +25,7 @@
   },
   "scripts": {
     "test": "node test/test.js",
-    "lint": "eslint src/",
-    "prepare": "npm run lint"
+    "lint": "eslint src/"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
