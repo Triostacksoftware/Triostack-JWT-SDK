@@ -1,12 +1,12 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import nodemailer from 'nodemailer';
-import { connectDB } from './db.js';
-import { getUserModel } from './model.js';
-import { cookieOptionsByEnv, generateOtpEmailHtml } from './utils/cookies.js';
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
+import { connectDB } from "./db.js";
+import { getUserModel } from "./model.js";
+import { cookieOptionsByEnv, generateOtpEmailHtml } from "./utils/cookies.js";
 
 function reqParam(name, value) {
-  if (value === undefined || value === null || value === '')
+  if (value === undefined || value === null || value === "")
     throw new Error(`${name} is required`);
 }
 
@@ -17,8 +17,8 @@ function generateOtp() {
 
 // Create email transporter
 function createTransporter(smtpConfig) {
-  return nodemailer.createTransporter({
-    host: 'smtp.gmail.com',
+  return nodemailer.createTransport({
+    host: "smtp.gmail.com",
     port: smtpConfig.SMTP_PORT,
     secure: false,
     auth: {
@@ -53,22 +53,22 @@ export async function register(params = {}) {
     ...restFields
   } = params;
 
-  reqParam('JWT_SECRET_KEY', JWT_SECRET_KEY);
-  reqParam('MONGODB_URI', MONGODB_URI);
-  reqParam('NODE_ENV', NODE_ENV);
-  reqParam('tableName', tableName);
-  reqParam('email', email);
-  reqParam('password', password);
+  reqParam("JWT_SECRET_KEY", JWT_SECRET_KEY);
+  reqParam("MONGODB_URI", MONGODB_URI);
+  reqParam("NODE_ENV", NODE_ENV);
+  reqParam("tableName", tableName);
+  reqParam("email", email);
+  reqParam("password", password);
 
   await connectDB(MONGODB_URI);
   const User = getUserModel(tableName);
 
   const existing = await User.findOne({ email });
-  if (existing) throw new Error('User already exists');
+  if (existing) throw new Error("User already exists");
 
   const hashed = await bcrypt.hash(password, 10);
 
-  const RESERVED = new Set(['_id', 'password', 'createdAt', 'updatedAt']);
+  const RESERVED = new Set(["_id", "password", "createdAt", "updatedAt"]);
   const safeExtra = {};
   for (const [k, v] of Object.entries(restFields)) {
     if (!RESERVED.has(k)) safeExtra[k] = v;
@@ -77,78 +77,78 @@ export async function register(params = {}) {
   const doc = new User({ email, password: hashed, ...safeExtra });
   await doc.save();
 
-  return { msg: 'User registered successfully', userId: String(doc._id) };
+  return { msg: "User registered successfully", userId: String(doc._id) };
 }
 
 export async function login(params = {}, res) {
   const { JWT_SECRET_KEY, MONGODB_URI, NODE_ENV, tableName, email, password } =
     params;
 
-  reqParam('JWT_SECRET_KEY', JWT_SECRET_KEY);
-  reqParam('MONGODB_URI', MONGODB_URI);
-  reqParam('NODE_ENV', NODE_ENV);
-  reqParam('tableName', tableName);
-  reqParam('email', email);
-  reqParam('password', password);
-  if (!res) throw new Error('res (Express response) is required for login');
+  reqParam("JWT_SECRET_KEY", JWT_SECRET_KEY);
+  reqParam("MONGODB_URI", MONGODB_URI);
+  reqParam("NODE_ENV", NODE_ENV);
+  reqParam("tableName", tableName);
+  reqParam("email", email);
+  reqParam("password", password);
+  if (!res) throw new Error("res (Express response) is required for login");
 
   await connectDB(MONGODB_URI);
   const User = getUserModel(tableName);
 
   const user = await User.findOne({ email });
-  if (!user) throw new Error('Invalid credentials');
+  if (!user) throw new Error("Invalid credentials");
 
   const ok = await bcrypt.compare(password, user.password);
-  if (!ok) throw new Error('Invalid credentials');
+  if (!ok) throw new Error("Invalid credentials");
 
   const token = jwt.sign(
     { id: String(user._id), email: user.email, name: user.name },
     JWT_SECRET_KEY,
-    { expiresIn: '1d' }
+    { expiresIn: "1d" }
   );
 
-  res.cookie('token', token, cookieOptionsByEnv(NODE_ENV));
+  res.cookie("token", token, cookieOptionsByEnv(NODE_ENV));
 
-  return { msg: 'Login successful', userId: String(user._id), token };
+  return { msg: "Login successful", userId: String(user._id), token };
 }
 
 export function logout({ res }) {
-  if (!res) throw new Error('res (Express response) is required for logout');
+  if (!res) throw new Error("res (Express response) is required for logout");
 
   // Clear cookie with both secure and non-secure options to handle all environments
-  res.clearCookie('token', {
+  res.clearCookie("token", {
     httpOnly: true,
-    sameSite: 'None',
+    sameSite: "None",
     secure: true,
-    path: '/',
+    path: "/",
   });
-  res.clearCookie('token', {
+  res.clearCookie("token", {
     httpOnly: true,
-    sameSite: 'Lax',
+    sameSite: "Lax",
     secure: false,
-    path: '/',
+    path: "/",
   });
 
-  return { msg: 'Logged out' };
+  return { msg: "Logged out" };
 }
 
 export function verifyToken(JWT_SECRET_KEY) {
-  reqParam('JWT_SECRET_KEY', JWT_SECRET_KEY);
+  reqParam("JWT_SECRET_KEY", JWT_SECRET_KEY);
   return (req, res, next) => {
     const token = req.cookies?.token;
-    if (!token) return res.status(401).json({ msg: 'Unauthorized' });
+    if (!token) return res.status(401).json({ msg: "Unauthorized" });
     try {
       const decoded = jwt.verify(token, JWT_SECRET_KEY);
       req.user = decoded;
       next();
     } catch {
-      return res.status(401).json({ msg: 'Invalid token' });
+      return res.status(401).json({ msg: "Invalid token" });
     }
   };
 }
 
 export function isLoggedIn({ req, JWT_SECRET_KEY }) {
-  reqParam('JWT_SECRET_KEY', JWT_SECRET_KEY);
+  reqParam("JWT_SECRET_KEY", JWT_SECRET_KEY);
   const token = req?.cookies?.token;
   if (!token) return null;
   try {
@@ -170,14 +170,14 @@ export async function generateRegisterOtp(params = {}) {
     email_descr,
   } = params;
 
-  reqParam('SMTP_PORT', SMTP_PORT);
-  reqParam('SMTP_USER', SMTP_USER);
-  reqParam('SMTP_PASS', SMTP_PASS);
-  reqParam('MONGODB_URI', MONGODB_URI);
-  reqParam('tableName', tableName);
-  reqParam('email', email);
-  reqParam('email_title', email_title);
-  reqParam('email_descr', email_descr);
+  reqParam("SMTP_PORT", SMTP_PORT);
+  reqParam("SMTP_USER", SMTP_USER);
+  reqParam("SMTP_PASS", SMTP_PASS);
+  reqParam("MONGODB_URI", MONGODB_URI);
+  reqParam("tableName", tableName);
+  reqParam("email", email);
+  reqParam("email_title", email_title);
+  reqParam("email_descr", email_descr);
 
   await connectDB(MONGODB_URI);
   const User = getUserModel(tableName);
@@ -185,7 +185,7 @@ export async function generateRegisterOtp(params = {}) {
   // Check if user already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    throw new Error('User already exists');
+    throw new Error("User already exists");
   }
 
   // Generate OTP and expiry (5 minutes from now)
@@ -210,7 +210,7 @@ export async function generateRegisterOtp(params = {}) {
   );
 
   return {
-    msg: 'OTP sent successfully for registration',
+    msg: "OTP sent successfully for registration",
     email,
   };
 }
@@ -219,11 +219,11 @@ export async function verifyOtpRegister(params = {}) {
   const { MONGODB_URI, tableName, email, otp, password, ...restFields } =
     params;
 
-  reqParam('MONGODB_URI', MONGODB_URI);
-  reqParam('tableName', tableName);
-  reqParam('email', email);
-  reqParam('otp', otp);
-  reqParam('password', password);
+  reqParam("MONGODB_URI", MONGODB_URI);
+  reqParam("tableName", tableName);
+  reqParam("email", email);
+  reqParam("otp", otp);
+  reqParam("password", password);
 
   await connectDB(MONGODB_URI);
   const User = getUserModel(tableName);
@@ -231,20 +231,20 @@ export async function verifyOtpRegister(params = {}) {
   // Find user with matching email and OTP
   const user = await User.findOne({ email, otp });
   if (!user) {
-    throw new Error('Invalid OTP or email');
+    throw new Error("Invalid OTP or email");
   }
 
   // Check if OTP is expired
   if (user.expiry < new Date()) {
     await User.deleteOne({ email }); // Clean up expired registration
-    throw new Error('OTP has expired. Please request a new one.');
+    throw new Error("OTP has expired. Please request a new one.");
   }
 
   // Hash password
   const hashed = await bcrypt.hash(password, 10);
 
   // Update user with password and remove OTP fields
-  const RESERVED = new Set(['_id', 'password', 'createdAt', 'updatedAt']);
+  const RESERVED = new Set(["_id", "password", "createdAt", "updatedAt"]);
   const safeExtra = {};
   for (const [k, v] of Object.entries(restFields)) {
     if (!RESERVED.has(k)) safeExtra[k] = v;
@@ -260,7 +260,7 @@ export async function verifyOtpRegister(params = {}) {
   );
 
   return {
-    msg: 'Registration completed successfully',
+    msg: "Registration completed successfully",
     userId: String(user._id),
   };
 }
@@ -277,14 +277,14 @@ export async function generateOtpLogin(params = {}) {
     email_descr,
   } = params;
 
-  reqParam('SMTP_PORT', SMTP_PORT);
-  reqParam('SMTP_USER', SMTP_USER);
-  reqParam('SMTP_PASS', SMTP_PASS);
-  reqParam('MONGODB_URI', MONGODB_URI);
-  reqParam('tableName', tableName);
-  reqParam('email', email);
-  reqParam('email_title', email_title);
-  reqParam('email_descr', email_descr);
+  reqParam("SMTP_PORT", SMTP_PORT);
+  reqParam("SMTP_USER", SMTP_USER);
+  reqParam("SMTP_PASS", SMTP_PASS);
+  reqParam("MONGODB_URI", MONGODB_URI);
+  reqParam("tableName", tableName);
+  reqParam("email", email);
+  reqParam("email_title", email_title);
+  reqParam("email_descr", email_descr);
 
   await connectDB(MONGODB_URI);
   const User = getUserModel(tableName);
@@ -292,7 +292,7 @@ export async function generateOtpLogin(params = {}) {
   // Check if user exists
   const user = await User.findOne({ email });
   if (!user) {
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
 
   // Generate OTP and expiry (5 minutes from now)
@@ -312,7 +312,7 @@ export async function generateOtpLogin(params = {}) {
   );
 
   return {
-    msg: 'OTP sent successfully for login',
+    msg: "OTP sent successfully for login",
     email,
   };
 }
@@ -320,12 +320,12 @@ export async function generateOtpLogin(params = {}) {
 export async function verifyOtpLogin(params = {}, res) {
   const { JWT_SECRET_KEY, MONGODB_URI, tableName, email, otp } = params;
 
-  reqParam('JWT_SECRET_KEY', JWT_SECRET_KEY);
-  reqParam('MONGODB_URI', MONGODB_URI);
-  reqParam('tableName', tableName);
-  reqParam('email', email);
-  reqParam('otp', otp);
-  if (!res) throw new Error('res (Express response) is required for login');
+  reqParam("JWT_SECRET_KEY", JWT_SECRET_KEY);
+  reqParam("MONGODB_URI", MONGODB_URI);
+  reqParam("tableName", tableName);
+  reqParam("email", email);
+  reqParam("otp", otp);
+  if (!res) throw new Error("res (Express response) is required for login");
 
   await connectDB(MONGODB_URI);
   const User = getUserModel(tableName);
@@ -333,30 +333,30 @@ export async function verifyOtpLogin(params = {}, res) {
   // Find user with matching email and OTP
   const user = await User.findOne({ email, otp });
   if (!user) {
-    throw new Error('Invalid OTP or email');
+    throw new Error("Invalid OTP or email");
   }
 
   // Check if OTP is expired
   if (user.expiry < new Date()) {
     await User.updateOne({ email }, { $unset: { otp: 1, expiry: 1 } });
-    throw new Error('OTP has expired. Please request a new one.');
+    throw new Error("OTP has expired. Please request a new one.");
   }
 
   // Generate JWT token
   const token = jwt.sign(
     { id: String(user._id), email: user.email, name: user.name },
     JWT_SECRET_KEY,
-    { expiresIn: '1d' }
+    { expiresIn: "1d" }
   );
 
   // Set cookie
-  res.cookie('token', token, cookieOptionsByEnv(params.NODE_ENV));
+  res.cookie("token", token, cookieOptionsByEnv(params.NODE_ENV));
 
   // Clear OTP fields
   await User.updateOne({ email }, { $unset: { otp: 1, expiry: 1 } });
 
   return {
-    msg: 'Login successful',
+    msg: "Login successful",
     userId: String(user._id),
     token,
   };

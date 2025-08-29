@@ -1,7 +1,7 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-export function getUserModel(tableName = "users") {
-  if (!tableName) throw new Error("tableName is required");
+export function getUserModel(tableName = 'users') {
+  if (!tableName) throw new Error('tableName is required');
 
   if (mongoose.models[tableName]) return mongoose.models[tableName];
 
